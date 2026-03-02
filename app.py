@@ -1,14 +1,14 @@
 import streamlit as st
-from inference import get_model
+from roboflow import Roboflow
 import numpy as np
 from PIL import Image
 
-API_KEY = "dvgsVyqzN3xfG3PwwtuE"
+# Secure API key
+API_KEY = st.secrets["API_KEY"]
 
-model = get_model(
-    model_id="forestfiredetection-kkcq0/2",
-    api_key=API_KEY
-)
+rf = Roboflow(api_key=API_KEY)
+project = rf.workspace().project("forestfiredetection-kkcq0")
+model = project.version(2).model
 
 st.title("🌲🔥 Forest Fire Detection System")
 
@@ -20,16 +20,16 @@ if uploaded_file is not None:
 
     if st.button("Detect"):
         image_np = np.array(image)
-        result = model.infer(image_np)[0]
-        predictions = result.predictions
+
+        prediction = model.predict(image_np).json()
 
         fire_detected = False
         smoke_detected = False
 
-        for pred in predictions:
-            if pred.class_name.lower() == "fire":
+        for pred in prediction["predictions"]:
+            if pred["class"].lower() == "fire":
                 fire_detected = True
-            elif pred.class_name.lower() == "smoke":
+            elif pred["class"].lower() == "smoke":
                 smoke_detected = True
 
         if fire_detected:
