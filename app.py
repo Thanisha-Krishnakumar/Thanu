@@ -50,14 +50,14 @@ if uploaded_file is not None:
                 smoke_detected = True
 
         if fire_detected:
-    st.write("🔥 Fire Detected!")
-    send_sms_alert("fire")
-    st.success("🚨 Fire Alert Sent Successfully!")
+            st.write("🔥 Fire Detected!")
+            send_sms_alert("fire")
+            st.success("🚨 Fire Alert Sent Successfully!")
 
-elif smoke_detected:
-    st.write("🌫 Smoke Detected!")
-    send_sms_alert("smoke")
-    st.success("⚠ Smoke Alert Sent Successfully!")
+        elif smoke_detected:
+            st.write("🌫 Smoke Detected!")
+            send_sms_alert("smoke")
+            st.success("⚠ Smoke Alert Sent Successfully!")
 
-else:
-    st.write("✅ No Fire or Smoke Detected")
+        else:
+            st.write("✅ No Fire or Smoke Detected")
