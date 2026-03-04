@@ -1,3 +1,4 @@
+from twilio.rest import Client
 import streamlit as st
 from roboflow import Roboflow
 import numpy as np
@@ -9,6 +10,22 @@ API_KEY = st.secrets["API_KEY"]
 rf = Roboflow(api_key=API_KEY)
 project = rf.workspace().project("forestfiredetection-kkcq0")
 model = project.version(2).model
+def send_sms_alert(alert_type):
+    client = Client(
+        st.secrets["TWILIO_SID"],
+        st.secrets["TWILIO_AUTH"]
+    )
+
+    if alert_type == "fire":
+        message_body = "🚨 CRITICAL ALERT: Forest Fire Detected! Immediate action required."
+    elif alert_type == "smoke":
+        message_body = "⚠ WARNING: Smoke Detected in Forest Area. Possible early fire stage."
+
+    client.messages.create(
+        body=message_body,
+        from_=st.secrets["TWILIO_PHONE"],
+        to=st.secrets["ALERT_PHONE"]
+    )
 
 st.title("🌲🔥 Forest Fire Detection System")
 
@@ -33,8 +50,14 @@ if uploaded_file is not None:
                 smoke_detected = True
 
         if fire_detected:
-            st.error("🔥 Fire Detected!")
-        elif smoke_detected:
-            st.warning("🌫 Smoke Detected!")
-        else:
-            st.success("✅ No Fire or Smoke Detected")
+    st.write("🔥 Fire Detected!")
+    send_sms_alert("fire")
+    st.success("🚨 Fire Alert Sent Successfully!")
+
+elif smoke_detected:
+    st.write("🌫 Smoke Detected!")
+    send_sms_alert("smoke")
+    st.success("⚠ Smoke Alert Sent Successfully!")
+
+else:
+    st.write("✅ No Fire or Smoke Detected")
