@@ -1,8 +1,11 @@
-from twilio.rest import Client
 import streamlit as st
 from roboflow import Roboflow
 import numpy as np
 from PIL import Image
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime
 
 # Secure API key
 API_KEY = st.secrets["API_KEY"]
@@ -10,22 +13,52 @@ API_KEY = st.secrets["API_KEY"]
 rf = Roboflow(api_key=API_KEY)
 project = rf.workspace().project("forestfiredetection-kkcq0")
 model = project.version(2).model
-def send_sms_alert(alert_type):
-    client = Client(
-        st.secrets["TWILIO_SID"],
-        st.secrets["TWILIO_AUTH"]
-    )
+def send_email_alert(alert_type):
+
+    sender_email = st.secrets["SENDER_EMAIL"]
+    sender_password = st.secrets["SENDER_PASSWORD"]
+    receiver_email = st.secrets["OFFICER_EMAIL"]
+
+    current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    location = "Anaimalai Forest Region, Tamil Nadu"
 
     if alert_type == "fire":
-        message_body = "🚨 CRITICAL ALERT: Forest Fire Detected! Immediate action required."
-    elif alert_type == "smoke":
-        message_body = "⚠ WARNING: Smoke Detected in Forest Area. Possible early fire stage."
+        subject = "🚨 CRITICAL FIRE ALERT"
+        body = f"""
+        Forest Fire Detected!
 
-    client.messages.create(
-        body=message_body,
-        from_=st.secrets["TWILIO_PHONE"],
-        to=st.secrets["ALERT_PHONE"]
-    )
+        Location: {location}
+        Time: {current_time}
+
+        Immediate action required.
+        """
+
+    elif alert_type == "smoke":
+        subject = "⚠ SMOKE WARNING ALERT"
+        body = f"""
+        Smoke Detected in Forest Area.
+
+        Location: {location}
+        Time: {current_time}
+
+        Possible early-stage wildfire.
+        """
+
+    # Create email
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = subject
+
+    msg.attach(MIMEText(body, "plain"))
+
+    # Send email
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.send_message(msg)
+    server.quit()
+
 
 st.title("🌲🔥 Forest Fire Detection System")
 
@@ -50,14 +83,14 @@ if uploaded_file is not None:
                 smoke_detected = True
 
         if fire_detected:
-            st.write("🔥 Fire Detected!")
-            send_sms_alert("fire")
-            st.success("🚨 Fire Alert Sent Successfully!")
+            st.error("🔥 Fire Detected!")
+            send_email_alert("fire")
+            st.success("📧 Email Alert Sent to Forest Officer!")
 
         elif smoke_detected:
-            st.write("🌫 Smoke Detected!")
-            send_sms_alert("smoke")
-            st.success("⚠ Smoke Alert Sent Successfully!")
+            st.warning("🌫 Smoke Detected!")
+            send_email_alert("smoke")
+            st.success("📧 Email Alert Sent to Forest Officer!")
 
         else:
-            st.write("✅ No Fire or Smoke Detected")
+            st.success("✅ No Fire or Smoke Detected")
