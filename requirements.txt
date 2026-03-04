@@ -3,3 +3,4 @@ roboflow
 numpy
 pillow
 opencv-python-headless
+twilio
