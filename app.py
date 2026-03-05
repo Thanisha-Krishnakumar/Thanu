@@ -41,15 +41,21 @@ def send_email_alert(alert_type):
 
 
     elif alert_type == "smoke":
-        subject = "⚠ SMOKE WARNING ALERT"
-        body = f"""
-        Smoke Detected in Forest Area.
+    subject = "⚠ SMOKE WARNING ALERT"
+    body = f"""
+    ⚠ SMOKE WARNING ALERT ⚠
 
-        Location: {location}
-        Time: {current_time}
+     Smoke Detected in Forest Area.
 
-        Possible early-stage wildfire.
-        """
+   Location: {location}
+   Zone: {zone}
+   Latitude: {latitude}
+   Longitude: {longitude}
+   Detection Time: {current_time}
+
+Possible early-stage wildfire.
+Field verification recommended.
+"""
 
     # Create email
     msg = MIMEMultipart()
