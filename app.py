@@ -27,15 +27,18 @@ def send_email_alert(alert_type):
     zone = "Anaimalai Tiger Reserve – Zone 3"
 
     if alert_type == "fire":
-        subject = "🚨 CRITICAL FIRE ALERT"
-        body = f"""
-        Forest Fire Detected!
+    subject = "🚨 CRITICAL FIRE ALERT"
+    body = f"""
+    🚨 FOREST FIRE ALERT 🚨
 
-        Location: {location}
-        Time: {current_time}
+   Fire Detected in Protected Forest Area!
 
-        Immediate action required.
-        """
+      Location: {location}
+      Zone: {zone}
+      Latitude: {latitude}
+      Longitude: {longitude}
+      Detection Time: {current_time}
+
 
     elif alert_type == "smoke":
         subject = "⚠ SMOKE WARNING ALERT"
