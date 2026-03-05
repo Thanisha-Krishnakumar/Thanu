@@ -20,7 +20,11 @@ def send_email_alert(alert_type):
     receiver_email = st.secrets["OFFICER_EMAIL"]
 
     current_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
     location = "Anaimalai Forest Region, Tamil Nadu"
+    latitude = "10.3610° N"
+    longitude = "76.9661° E"
+    zone = "Anaimalai Tiger Reserve – Zone 3"
 
     if alert_type == "fire":
         subject = "🚨 CRITICAL FIRE ALERT"
